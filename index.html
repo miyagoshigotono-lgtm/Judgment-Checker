@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Judgment">
+  <meta name="theme-color" content="#0a0a0f">
+  <title>Judgment Checker</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="app-title">JUDGMENT CHECKER</div>
+    <button class="btn-log" id="btnShowLog">LOG</button>
+  </header>
+
+  <!-- PROGRESS -->
+  <div class="progress-bar">
+    <div class="progress-fill" style="width:0%"></div>
+  </div>
+
+  <!-- ===== HOME ===== -->
+  <div class="screen active" id="screen-home">
+    <div class="home-hero">
+      <div>
+        <div class="home-label">Daily Check</div>
+        <div class="home-title">今日の<br>認知機能は？</div>
+        <div class="home-sub">睡眠時間を記録して<br>反応速度と計算力を測定</div>
+      </div>
+
+      <div class="time-inputs">
+        <div class="time-row">
+          <label>就寝時刻</label>
+          <input type="time" id="bedTime" value="23:00">
+        </div>
+        <div class="time-row">
+          <label>起床時刻</label>
+          <input type="time" id="wakeTime" value="06:30">
+        </div>
+        <div class="sleep-preview" id="sleepPreview">就寝・起床時刻を入力</div>
+      </div>
+
+      <button class="btn-primary" id="startBtn" disabled>テスト開始</button>
+    </div>
+  </div>
+
+  <!-- ===== REACTION ===== -->
+  <div class="screen" id="screen-reaction">
+    <div class="reaction-info">
+      <div class="reaction-count" id="reactionCount">0 / 10</div>
+      <div class="reaction-avg" id="reactionAvg"></div>
+    </div>
+
+    <div class="reaction-arena">
+      <div class="reaction-status" id="reactionStatus">準備中...</div>
+
+      <div class="target-grid">
+        <button class="target-btn waiting" data-idx="0"><div class="target-inner"></div></button>
+        <button class="target-btn waiting" data-idx="1"><div class="target-inner"></div></button>
+        <button class="target-btn waiting" data-idx="2"><div class="target-inner"></div></button>
+        <button class="target-btn waiting" data-idx="3"><div class="target-inner"></div></button>
+      </div>
+
+      <div class="reaction-result" id="reactionResult"></div>
+    </div>
+
+    <div style="padding-bottom:16px;color:#8888aa;font-size:12px;text-align:center;font-family:'Space Mono',monospace;">
+      光ったボタンをすぐタップ
+    </div>
+  </div>
+
+  <!-- ===== CALC ===== -->
+  <div class="screen" id="screen-calc">
+    <div class="calc-header">
+      <div class="calc-count" id="calcCount">1 / 5</div>
+      <div class="calc-timer-bar">
+        <div class="calc-timer-fill" id="calcTimerFill"></div>
+      </div>
+    </div>
+
+    <div class="calc-arena">
+      <div class="calc-question" id="calcQuestion">12 <span class="op">×</span> 7</div>
+      <div class="calc-feedback" id="calcFeedback"></div>
+    </div>
+
+    <div class="calc-bottom">
+      <input
+        class="calc-input"
+        id="calcInput"
+        type="number"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        placeholder="答えを入力"
+        autocomplete="off"
+      >
+      <button class="btn-primary" id="calcNextBtn">次へ →</button>
+    </div>
+  </div>
+
+  <!-- ===== RESULT ===== -->
+  <div class="screen" id="screen-result">
+    <div class="result-content">
+      <div class="result-score-wrap">
+        <div class="result-label">TOTAL SCORE</div>
+        <div class="result-score" id="resultScore">--</div>
+        <div class="result-score-max">/ 100</div>
+        <div class="result-grade" id="resultGrade">---</div>
+      </div>
+
+      <div class="result-breakdown">
+        <div class="breakdown-row">
+          <div class="breakdown-key">反応スコア</div>
+          <div class="breakdown-val" id="bdReactionScore">--</div>
+        </div>
+        <div class="breakdown-row">
+          <div class="breakdown-key">計算スコア</div>
+          <div class="breakdown-val" id="bdCalcScore">--</div>
+        </div>
+        <div class="breakdown-row">
+          <div class="breakdown-key">平均反応時間</div>
+          <div class="breakdown-val" id="bdAvgRt">--</div>
+        </div>
+        <div class="breakdown-row">
+          <div class="breakdown-key">遅延（500ms超）</div>
+          <div class="breakdown-val" id="bdLapses">--</div>
+        </div>
+        <div class="breakdown-row">
+          <div class="breakdown-key">計算正解数</div>
+          <div class="breakdown-val" id="bdCalcCorrect">--</div>
+        </div>
+      </div>
+
+      <div class="result-sleep">
+        睡眠時間 <span id="resultSleepTime">--</span>
+      </div>
+
+      <div style="display:flex;gap:10px;width:100%;">
+        <button class="btn-primary" id="btnRetry" style="flex:1;font-size:13px;padding:14px;">もう一度</button>
+        <button class="btn-primary" id="btnShowLogResult" style="flex:1;font-size:13px;padding:14px;background:#1a1a26;color:#8888aa;border:1px solid #2a2a3a;">ログを見る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LOG ===== -->
+  <div class="screen" id="screen-log">
+    <div class="log-header">
+      <div class="log-title">SCORE LOG</div>
+      <button class="btn-back" id="btnBack">← 戻る</button>
+    </div>
+
+    <div class="log-chart-wrap">
+      <div class="log-chart-label">SCORE TREND</div>
+      <canvas id="scoreChart"></canvas>
+    </div>
+
+    <div class="log-list" id="logList"></div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
